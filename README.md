@@ -57,11 +57,20 @@ Este proyecto implementa un sistema de registro de **leads** (candidatos interes
 - ✅ **OCP** (Open/Closed): Abierto para extensión, cerrado para modificación
 - ✅ **DIP** (Dependency Inversion): Dependemos de abstracciones, no de implementaciones concretas
 
-### Arquitectura Hexagonal
-- **Domain**: Entidades y contratos (interfaces)
-- **Application**: Casos de uso (lógica de negocio)
-- **Infrastructure**: Implementaciones concretas (AMQP, SMTP, Supabase)
-- **Presentation**: Puntos de entrada (HTTP, consumidores)
+### Arquitectura en Capas (Layered Architecture)
+```
+┌─────────────────────┐
+│   Presentation      │  ← HTTP, Consumidores AMQP
+├─────────────────────┤
+│   Application       │  ← Casos de uso (lógica de negocio)
+├─────────────────────┤
+│      Domain         │  ← Entidades, Schemas, Contratos
+├─────────────────────┤
+│  Infrastructure     │  ← Implementaciones (AMQP, SMTP, Supabase)
+└─────────────────────┘
+```
+
+Cada capa tiene responsabilidades específicas y las dependencias fluyen hacia el dominio:
 
 ## 🚀 Instalación
 
