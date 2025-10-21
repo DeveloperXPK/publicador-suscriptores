@@ -1,30 +1,48 @@
 const dotenv = require("dotenv");
+
 dotenv.config();
-const { consumeJson, shutdown } = require("./src/infrastructure/rabbit.js"); // el cliente Rabbit
-const { saveLead } = require("./src/application/saveLead.usecase.js"); // tu lógica de negocio
 
-// 2️⃣ Define una función principal asincrónica
-async function main() {
-    // consumeJson: escucha la cola, recibe cada mensaje y ejecuta una función
-    await consumeJson(async (payload) => {
-        // Aquí decides qué hacer con cada mensaje recibido
-        await saveLead(payload); // ejecuta el caso de uso (valida y guarda)
-    });
+const { AMQPJsonConsumer } = require("./src/infrastructure/AMQPJsonConsumer.js");
+const { SupabaseLeadRepository } = require("./src/infrastructure/repositories/SupabaseLeadRepository.js");
+const { SaveLeadUseCase } = require("./src/application/SaveLeadUseCase.js");
 
-    // 3️⃣ Captura señales del sistema para cerrar limpio
-    process.on("SIGINT", async () => { // Ctrl+C en consola
-        await shutdown(); // cierra canal y conexión Rabbit
-        process.exit(0);
-    });
+const leadRepository = new SupabaseLeadRepository({
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY,
+    table: process.env.SUPABASE_TABLE,
+});
 
-    process.on("SIGTERM", async () => { // parada desde Docker o sistema
-        await shutdown();
-        process.exit(0);
-    });
+const saveLeadUseCase = new SaveLeadUseCase(leadRepository);
+
+const consumer = new AMQPJsonConsumer({
+    url: process.env.CLOUDAMQP_URL,
+    exchange: process.env.CLOUDAMQP_EXCHANGE,
+    queue: process.env.QUEUE,
+    routingKey: process.env.ROUTING_KEY,
+    prefetch: process.env.PREFETCH,
+    connectionName: "suscriptor-bd",
+});
+
+async function start() {
+    console.log("[SuscriptorBD] Escuchando mensajes...");
+    await consumer.start((payload) => saveLeadUseCase.execute(payload));
 }
 
-// 4️⃣ Ejecuta la función
-main().catch((e) => {
-    console.error("Fatal bootstrap error:", e);
+async function stop() {
+    await consumer.stop();
+}
+
+process.on("SIGINT", async () => {
+    await stop();
+    process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+    await stop();
+    process.exit(0);
+});
+
+start().catch((error) => {
+    console.error("Error iniciando suscriptor de base de datos:", error);
     process.exit(1);
 });
