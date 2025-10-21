@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pre Inscripción - Unilasallista</title>
+</head>
+<body>
+  <h1>Bienvenido a la Pre Inscripción - Unilasallista</h1>
+  <p>Completa el formulario.</p>
+
+  <form id="f">
+    <fieldset>
+      <label for="nombre">Nombre:</label>
+      <input id="nombre" name="nombre" required />
+
+      <label for="apellido">Apellido:</label>
+      <input id="apellido" name="apellido" required />
+
+      <label for="email">Email:</label>
+      <input id="email" name="email" type="email" required />
+
+      <label for="carrera">Carrera:</label>
+      <select name="carrera" id="carrera" required>
+        <option value="">Seleccione una carrera</option>
+        <option value="ING-SIST">Ingeniería</option>
+        <option value="MED">Medicina</option>
+        <option value="DER">Derecho</option>
+        <option value="PSI">Psicología</option>
+      </select>
+
+      <label>
+        <input type="checkbox" id="consent" name="consent" />
+        Acepto que me contacten
+      </label>
+
+      <button type="submit">Enviar</button>
+    </fieldset>
+  </form>
+
+  <script>
+    document.getElementById("f").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+
+      const payload = {
+        // el backend puede generar id/created_at
+        nombre: `${data.get("nombre")} ${data.get("apellido")}`.trim(),
+        email: data.get("email"),
+        programa: data.get("carrera"),
+      };
+
+      const res = await fetch("http://localhost:3001/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const msg = await res.json();
+      alert(res.ok ? "Enviado ✅" : "Error ❌: " + (msg.error || "desconocido"));
+    });
+  </script>
+</body>
+</html>
