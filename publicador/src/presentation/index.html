@@ -8,7 +8,7 @@
   <h1>Bienvenido a la Pre Inscripción - Unilasallista</h1>
   <p>Completa el formulario.</p>
 
-  <form id="f">
+  <form id="formularioPreInscripcion"">
     <fieldset>
       <label for="nombre">Nombre:</label>
       <input id="nombre" name="nombre" required />
@@ -22,28 +22,22 @@
       <label for="carrera">Carrera:</label>
       <select name="carrera" id="carrera" required>
         <option value="">Seleccione una carrera</option>
-        <option value="ING-SIST">Ingeniería</option>
-        <option value="MED">Medicina</option>
-        <option value="DER">Derecho</option>
-        <option value="PSI">Psicología</option>
+        <option value="Ingenieria">Ingeniería</option>
+        <option value="Medicina">Medicina</option>
+        <option value="Derecho">Derecho</option>
+        <option value="Psicologia">Psicología</option>
       </select>
-
-      <label>
-        <input type="checkbox" id="consent" name="consent" />
-        Acepto que me contacten
-      </label>
 
       <button type="submit">Enviar</button>
     </fieldset>
   </form>
 
   <script>
-    document.getElementById("f").addEventListener("submit", async (e) => {
+    document.getElementById("formularioPreInscripcion").addEventListener("submit", async (e) => {
       e.preventDefault();
       const data = new FormData(e.target);
 
       const payload = {
-        // el backend puede generar id/created_at
         nombre: `${data.get("nombre")} ${data.get("apellido")}`.trim(),
         email: data.get("email"),
         programa: data.get("carrera"),
