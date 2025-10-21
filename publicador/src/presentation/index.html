@@ -2,35 +2,56 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pre Inscripción - Unilasallista</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>Bienvenido a la Pre Inscripción - Unilasallista</h1>
-  <p>Completa el formulario.</p>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+          <div class="card-body p-4">
+            <h1 class="card-title text-center mb-3">Bienvenido a la Pre Inscripción</h1>
+            <h2 class="h5 text-center text-muted mb-4">Unilasallista</h2>
+            <p class="text-center text-secondary">Completa el formulario para continuar.</p>
 
-  <form id="formularioPreInscripcion"">
-    <fieldset>
-      <label for="nombre">Nombre:</label>
-      <input id="nombre" name="nombre" required />
+            <form id="formularioPreInscripcion">
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre:</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required />
+              </div>
 
-      <label for="apellido">Apellido:</label>
-      <input id="apellido" name="apellido" required />
+              <div class="mb-3">
+                <label for="apellido" class="form-label">Apellido:</label>
+                <input type="text" class="form-control" id="apellido" name="apellido" required />
+              </div>
 
-      <label for="email">Email:</label>
-      <input id="email" name="email" type="email" required />
+              <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required />
+              </div>
 
-      <label for="carrera">Carrera:</label>
-      <select name="carrera" id="carrera" required>
-        <option value="">Seleccione una carrera</option>
-        <option value="Ingenieria">Ingeniería</option>
-        <option value="Medicina">Medicina</option>
-        <option value="Derecho">Derecho</option>
-        <option value="Psicologia">Psicología</option>
-      </select>
+              <div class="mb-3">
+                <label for="carrera" class="form-label">Carrera:</label>
+                <select class="form-select" name="carrera" id="carrera" required>
+                  <option value="">Seleccione una carrera</option>
+                  <option value="Ingenieria">Ingeniería</option>
+                  <option value="Medicina">Medicina</option>
+                  <option value="Derecho">Derecho</option>
+                  <option value="Psicologia">Psicología</option>
+                </select>
+              </div>
 
-      <button type="submit">Enviar</button>
-    </fieldset>
-  </form>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Enviar Inscripción</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     document.getElementById("formularioPreInscripcion").addEventListener("submit", async (e) => {
@@ -43,15 +64,26 @@
         programa: data.get("carrera"),
       };
 
-      const res = await fetch("http://localhost:3001/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      try {
+        const res = await fetch("http://localhost:3001/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      const msg = await res.json();
-      alert(res.ok ? "Enviado ✅" : "Error ❌: " + (msg.error || "desconocido"));
+        const msg = await res.json();
+        
+        if (res.ok) {
+          alert("✅ Inscripción enviada exitosamente");
+          e.target.reset();
+        } else {
+          alert("❌ Error: " + (msg.error || "desconocido"));
+        }
+      } catch (error) {
+        alert("❌ Error de conexión: " + error.message);
+      }
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -12,6 +12,7 @@
   "dependencies": {
     "amqplib": "^0.10.9",
     "dotenv": "^17.2.3",
-    "nodemailer": "^7.0.9"
+    "nodemailer": "^7.0.9",
+    "zod": "^4.1.12"
   }
 }
